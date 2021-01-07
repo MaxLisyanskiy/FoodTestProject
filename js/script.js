@@ -136,4 +136,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     window.addEventListener('scroll', showModalByScroll);
 
+    //Class
+    class Menu {
+        constructor(src, alt, title, descr, price, parent) {
+            this.src = src;
+            this.alt = alt;
+            this.title = title;
+            this.descr = descr;
+            this.price = price;
+            this.parent = document.querySelector(parent);
+        }
+
+        render() {
+            const menuItem = document.createElement('div');
+            menuItem.innerHTML = `
+                <div class="menu__item">
+                    <img src=${this.src} alt=${this.alt}>
+                    <h3 class="menu__item-subtitle">${this.title}</h3>
+                    <div class="menu__item-descr">${this.descr}</div>
+                    <div class="menu__item-divider"></div>
+                    <div class="menu__item-price">
+                        <div class="menu__item-cost">Цена:</div>
+                        <div class="menu__item-total"><span>${this.price}</span> грн/день</div>
+                    </div>
+                </div>
+            `;
+            this.parent.append(menuItem);
+        }
+    }
+
+    new Menu(
+        'img/tabs/vegy.jpg', 
+        'vegy', 
+        'Меню Тест', 
+        'Обжаренные кусочки филе тунца, анчоусы, свежий огурец, помидоры черри, зелёная стручковая фасоль, отварной мини картофель, перепелиное яйцо, салат Айсберг, кольца красного лука, каперсы 260 г.', 
+        325, 
+        '.menu__field .container').render();
 });
