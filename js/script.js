@@ -175,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	
 	//forms
-
 	const forms = document.querySelectorAll('form'),
 		  message = {
 			load: 'Загрузка',
