@@ -172,4 +172,53 @@ document.addEventListener('DOMContentLoaded', () => {
         'Обжаренные кусочки филе тунца, анчоусы, свежий огурец, помидоры черри, зелёная стручковая фасоль, отварной мини картофель, перепелиное яйцо, салат Айсберг, кольца красного лука, каперсы 260 г.', 
         325, 
         '.menu__field .container').render();
+
+	
+	//forms
+
+	const forms = document.querySelectorAll('form'),
+		  message = {
+			load: 'Загрузка',
+			success: 'Данные успешно отправлены!',
+			error: 'Ошибка, повторите снова...'
+		  };
+
+
+	forms.forEach(item => {
+		postForms(item);
+	});
+
+	function postForms(form) {
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+
+			const messageOnSite = document.createElement('div');
+			messageOnSite.textContent = message.load;
+			form.append(messageOnSite);
+
+			const request = new XMLHttpRequest();
+			request.open('POST', 'server.php');
+
+			const formData = new FormData(form);
+			request.send(formData);
+
+			request.addEventListener('load', () => {
+				if (request.status === 200) {
+					console.log(request.response);
+					form.reset();
+					messageOnSite.textContent = message.success;
+					setTimeout(() => {
+						messageOnSite.remove();
+					}, 2000);
+				} else {
+					messageOnSite.textContent = message.error;
+				}
+			});
+
+
+		});
+	}
+
+
+
 });
