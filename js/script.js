@@ -94,8 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //Modal
     const modalButton = document.querySelectorAll('[data-modalButton]'),
-          modal = document.querySelector('[data-modal]'),
-          close = document.querySelector('[data-close]');
+          modal = document.querySelector('[data-modal]');
+
 
     function openModal() {
         modal.style.display = 'block';
@@ -112,10 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', openModal);
     });
 
-    close.addEventListener('click', closeModal);
-
     modal.addEventListener('click', (e) => {
-        if(e.target == modal) {
+        if(e.target == modal || e.target.getAttribute('data-close') == '') {
             closeModal();
         }
     });
@@ -177,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	//forms
 	const forms = document.querySelectorAll('form'),
 		  message = {
-			load: 'Загрузка',
+			load: 'icons/spinner.svg',
 			success: 'Данные успешно отправлены!',
 			error: 'Ошибка, повторите снова...'
 		  };
@@ -191,8 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		form.addEventListener('submit', (e) => {
 			e.preventDefault();
 
-			const messageOnSite = document.createElement('div');
-			messageOnSite.textContent = message.load;
+			const messageOnSite = document.createElement('img');
+            messageOnSite.src = message.load;
+            messageOnSite.style.cssText = `
+                display: block;
+                margin: 0 auto;
+            `;
 			form.append(messageOnSite);
 
 			const request = new XMLHttpRequest();
@@ -204,20 +206,39 @@ document.addEventListener('DOMContentLoaded', () => {
 			request.addEventListener('load', () => {
 				if (request.status === 200) {
 					console.log(request.response);
-					form.reset();
-					messageOnSite.textContent = message.success;
-					setTimeout(() => {
-						messageOnSite.remove();
-					}, 2000);
+                    showThanksModal(message.success);
+                    form.reset();
+                    messageOnSite.remove();
 				} else {
-					messageOnSite.textContent = message.error;
+					showThanksModal(message.error);
 				}
 			});
-
-
 		});
 	}
 
+    function showThanksModal(message) {
+        const prevModalDialog = document.querySelector('.modal__dialog');
 
+        prevModalDialog.classList.add('hide');
+        openModal();
+
+        const thanksModal = document.createElement('div');
+        thanksModal.classList.add('modal__dialog');
+        thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div class="modal__close" data-close>x</div>
+                <div class="modal__title">${message}</div>
+            </div>
+        `;
+
+        document.querySelector('.modal').append(thanksModal);
+
+        setTimeout(() => {
+            thanksModal.remove();
+            prevModalDialog.classList.add('show');
+            prevModalDialog.classList.remove('hide');
+            closeModal();
+        }, 4000);
+    }
 
 });
