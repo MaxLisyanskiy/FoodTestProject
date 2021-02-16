@@ -7,3 +7,11 @@
 .show {
     display: block;
 }
+
+.menu .container {
+    flex-wrap: wrap;
+}
+
+.menu__item{
+    margin-bottom: 40px;
+}

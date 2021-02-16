@@ -163,15 +163,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    new Menu(
-        'img/tabs/vegy.jpg', 
-        'vegy', 
-        'Меню Тест', 
-        'Обжаренные кусочки филе тунца, анчоусы, свежий огурец, помидоры черри, зелёная стручковая фасоль, отварной мини картофель, перепелиное яйцо, салат Айсберг, кольца красного лука, каперсы 260 г.', 
-        325, 
-        '.menu__field .container').render();
+    const getResource = async (url) => {
+        const res = await fetch(url);
 
-	
+        if (!res.ok) {
+            throw new Error(`Couldn't fetch ${url}, status: ${res.status}`);
+        }
+
+        return await res.json();
+    };
+
+    getResource('http://localhost:3000/menu')
+        .then(data => {
+            data.forEach(({img, altimg, title, descr, price}) => {
+                new Menu(img, altimg, title, descr, price, '.menu .container').render();
+            });
+        });
+
 	//forms
 	const forms = document.querySelectorAll('form'),
 		  message = {
@@ -184,6 +192,18 @@ document.addEventListener('DOMContentLoaded', () => {
 	forms.forEach(item => {
 		postForms(item);
 	});
+
+    const postData = async (url, data) => {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                'Content-type' : 'application/json'
+            },
+            body: data
+        });
+
+        return await res.json();
+    };
 
 	function postForms(form) {
 		form.addEventListener('submit', (e) => {
@@ -199,20 +219,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			const formData = new FormData(form);
 
-            const obj = {};
-            formData.forEach(function(value,key) {
-                obj[key] = value;
-            });
+            const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-            const json = JSON.stringify(obj);
-
-            fetch('server.php', {
-                method: "POST",
-                headers: {
-                    'Content-type' : 'aplication/json'
-                },
-                body: json
-            }).then( data => data.text()).then(data => {
+            postData('http://localhost:3000/requests', json)
+            .then(data => {
                 console.log(data);
                 showThanksModal(message.success);
                 messageOnSite.remove();
@@ -248,11 +258,4 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }, 4000);
     }
-
-
-    fetch('http://localhost:3000/menu')
-        .then(data => data.json())
-        .then(res => console.log(res));
-
-
 });
